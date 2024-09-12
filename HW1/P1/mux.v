@@ -1,7 +1,8 @@
-module MUX(Cin, C1, C2, S1, S2, C, S);
-input Cin, C1, C2, S1, S2;
-output C, S;
+module mux(sel, A, B, Out);
+parameter N = 1;
+input sel;
+input [N-1:0] A, B;
+output [N-1:0] Out;
 
-assign C = Cin ? C1 : C2;
-assign S = Cin ? S1 : S2;
+assign Out = sel ? B : A;
 endmodule
