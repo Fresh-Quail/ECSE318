@@ -2,3 +2,7 @@
 *.mti
 *.mpf
 *.bak
+*.swp
+*.wlf
+*.txt
+**/transcript
