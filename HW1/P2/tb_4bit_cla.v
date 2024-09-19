@@ -28,7 +28,7 @@ module tb_4bit_cla();
 
         // test case 3 
         A = 4'b1111; B = 4'b1111; Cin = 1'b1;
-        #2400; // wait 100 time units
+        #800; // wait 800 time units
         $display("A=%b B=%b Cin=%b -> Sum=%b Cout=%b", A, B, Cin, sum, Cout);
 
         $finish;   
