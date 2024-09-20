@@ -6,6 +6,4 @@ module PGgenerator(A, B, P, G);
 
   xor #10 pro(P,A,B);
 
-
-
 endmodule

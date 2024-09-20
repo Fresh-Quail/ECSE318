@@ -1,7 +1,7 @@
 module carryGenerateBlock(
-    input [3:0] P, G,  // Propagate and Generate signals from 4 bits
-    input Cin,         // Carry-in from the previous stage (C0)
-    output [3:1] Cout     // Carry-out for each stage
+    input [3:0] P, G,  // propagate and generate
+    input Cin,         // carry-in from first stage (C0)
+    output [3:1] Cout     // carry-out for each stage
 );  
 
 
