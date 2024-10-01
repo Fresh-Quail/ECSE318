@@ -33,16 +33,16 @@ module sumGenerator(
     );
 
     // sum[0]
-    xor #10 sum_0(sum[0], P[0], Cin);
+    xor  sum_0(sum[0], P[0], Cin);
 
     // sum[1]
-    xor #10 sum_1(sum[1], P[1], Cout[1]);
+    xor  sum_1(sum[1], P[1], Cout[1]);
 
     // sum[2]
-    xor #10 sum_2(sum[2], P[2], Cout[2]);
+    xor sum_2(sum[2], P[2], Cout[2]);
 
     // sum[3]
-    xor #10 sum_3(sum[3], P[3], Cout[3]);
+    xor sum_3(sum[3], P[3], Cout[3]);
 
     //Cout for 4th stage
 

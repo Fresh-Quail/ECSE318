@@ -6,7 +6,7 @@ output overflow;
 
 case(alu_code[4:3])
     2'b00: begin
-            ALU alu(A, B, alu_code[2:0], CIN, COE, C, VOUT, COUT);
+            ALU alu(A, B, alu_code[2:0], 1'b0, 1'b0, C, VOUT, COUT); //Cin set to 0 - COE set to 1 (inactive High)
     end
 
     2'b01: begin
@@ -32,12 +32,35 @@ case(alu_code[4:3])
         case(alu_code[2:0])
             wire [15:0] Sum_out;
             ALU alu(A, B, 3'b010, 1'b0, COE, Sum_out, VOUT, COUT); //Subtract B from A
-            3'b000: assign C = {7'b0, }
-            // 3'b001: assign C = 
-            // 3'b010: assign C = 
-            // 3'b011: assign C = 
-            // 3'b100: assign C = 
-            // 3'b101: assign C = 
+            // A <= B
+            3'b000: begin 
+                assign compare = A[15] ^ B[15] ? (A[15]) : ((Sum_out[15]) | ~|Sum_out)
+            end
+
+            3'b001: assign C = {7'b0, VOUT} // A < B
+                // If MSB of A & B are different A[15] ^ B[15] = 1
+                // And B is negative (1), then A > B and A = 1 = B 
+                assign compare = A[15] ^ B[15] ? (A[15]) : (Sum_out[15])
+
+            // A >= B
+            3'b010: begin 
+                // If MSB of A & B are different A[15] ^ B[15] = 1
+                // And B is negative (1), then A > B and A = 1 = B 
+                // ~|Sum_out == A == B
+                assign compare = A[15] ^ B[15] ? (B[15]) : ~(Sum_out[15])
+            end
+            
+            // A > B
+            3'b011: begin
+                // If MSB of A & B are different A[15] ^ B[15] = 1
+                // And B is negative (1), then A > B and A = 1 = B 
+                assign compare = A[15] ^ B[15] ? (B[15]) : ~(Sum_out[15]) & |Sum_out
+            end
+
+            // A = B
+            3'b100: assign C = ~|Sum_out
+            // A != B
+            3'b101: assign C = |Sum_out
         endcase
     end
 endcase
