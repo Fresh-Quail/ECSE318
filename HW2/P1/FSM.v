@@ -20,6 +20,7 @@ always @(*) begin
         end
 
         2'b01: begin
+            overflow = 1'b0;
             case(alu_code[2:0])
                 3'b000: C = A & B;
                 3'b001: C = A | B;
@@ -29,6 +30,7 @@ always @(*) begin
         end
 
         2'b10: begin
+            overflow = 1'b0;
             case(alu_code[2:0])
                 3'b000: C = A << B[3:0];
                 3'b001: C = A >> B[3:0];
@@ -38,6 +40,7 @@ always @(*) begin
         end
 
         2'b11: begin
+            overflow = 1'b0;
             case(alu_code[2:0])
                 // ALU alu(A, B, 3'b010, 1'b0, COE, Sum_out, VOUT, COUT); //Subtract B from A
                 // A <= B
