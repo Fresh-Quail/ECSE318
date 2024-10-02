@@ -9,10 +9,8 @@ output VOUT;
 //NOTE: Overflow checking is different for signed and unsigned subtraction
 wire cla_cout[3:0];
 wire [15:0] Bop;
-reg [15:0] V, cout;
+reg [15:0] VOUT, COUT;
 
-assign VOUT = V;
-assign COUT = cout;
 assign Bop = CODE[2] ? (CODE[0] ?  16'h0001 : 16'hFFFF) : B ^ CODE[1];
 
 sumGenerator cla_0(.A(A[3:0]), .B(Bop[3:0]), .Cin(CODE[1]), .sum(C[3:0]), .Cout_final(cla_cout[0]) ); 
@@ -25,35 +23,35 @@ always @(*) begin
         //Done
         // signed addition
         3'b000: begin
-            cout = COE ? 1'bx : cla_cout[3];
-            V = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
+            COUT = COE ? 1'bx : cla_cout[3];
+            VOUT = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
         end
         //Done
         // unsigned addition
         3'b001: begin
-            cout = COE ? 1'bx : cla_cout[3];
-            V = cout;
+            COUT = COE ? 1'bx : cla_cout[3];
+            VOUT = COUT;
         end
         //NOTE: Can probably collapse signed addition and subtraction into one case
         // signed subtraction
         3'b010: begin
-            cout = COE ? 1'bx : cla_cout[3];
-            V = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
+            COUT = COE ? 1'bx : cla_cout[3];
+            VOUT = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
         end
         // unsigned subtraction
         3'b011: begin
-            cout = COE ? 1'bx : cla_cout[3];
-            V = ~cout;
+            COUT = COE ? 1'bx : cla_cout[3];
+            VOUT = ~COUT;
         end
         // signed increment
         3'b100: begin
-            assign cout = COE ? 1'bx : cla_cout[3];
-            assign V = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
+            COUT = COE ? 1'bx : cla_cout[3];
+            VOUT = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
         end
         //signed decrement
         3'b101: begin
-            cout = COE ? 1'bx : cla_cout[3];
-            V = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
+            COUT = COE ? 1'bx : cla_cout[3];
+            VOUT = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
         end
     endcase
 end
