@@ -33,10 +33,10 @@ module sumGenerator(
     );
 
     // sum[0]
-    xor  sum_0(sum[0], P[0], Cin);
+    xor sum_0(sum[0], P[0], Cin);
 
     // sum[1]
-    xor  sum_1(sum[1], P[1], Cout[1]);
+    xor sum_1(sum[1], P[1], Cout[1]);
 
     // sum[2]
     xor sum_2(sum[2], P[2], Cout[2]);
@@ -47,11 +47,11 @@ module sumGenerator(
     //Cout for 4th stage
 
     wire [3:0] c4_result;
-    and #10 c4_1st_wire(c4_result[0], P[3], P[2], P[1], P[0], Cin);
-    and #10 c4_2st_wire(c4_result[1], P[3], P[2], P[1], G[0]);
-    and #10 c4_3rd_wire(c4_result[2], P[3], P[2], G[1]);
-    and #10 c4_4th_wire(c4_result[3], P[3],G[2]);
-    or #10 fourth_carry(Cout_final, c4_result[3], c4_result[2], c4_result[1], c4_result[0], G[3]);
+    and c4_1st_wire(c4_result[0], P[3], P[2], P[1], P[0], Cin);
+    and c4_2st_wire(c4_result[1], P[3], P[2], P[1], G[0]);
+    and c4_3rd_wire(c4_result[2], P[3], P[2], G[1]);
+    and c4_4th_wire(c4_result[3], P[3],G[2]);
+    or fourth_carry(Cout_final, c4_result[3], c4_result[2], c4_result[1], c4_result[0], G[3]);
 
 endmodule
 

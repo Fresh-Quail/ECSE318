@@ -1,17 +1,30 @@
 module ALU(A, B, CODE, CIN, COE, C, VOUT, COUT);
 input [15:0] A, B;
 input [2:0] CODE;
-input CIN, COE;  
+input CIN, COE; 
 output [15:0] C;
 output COUT;
 output VOUT;
 
 //NOTE: Overflow checking is different for signed and unsigned subtraction
-wire cla_cout[3:0];
+wire [3:0] cla_cout;
 wire [15:0] Bop;
-reg [15:0] VOUT, COUT;
+reg VOUT, COUT;
 
-assign Bop = CODE[2] ? (CODE[0] ?  16'h0001 : 16'hFFFF) : B ^ CODE[1];
+/** 
+if CODE[2] == 1, then 
+    if CODE[0] == 1, then 
+        Bop = 16'hFFFF //CODE = 101 - subtract 1
+    else
+        Bop = 16'h0001 // CODE = 100 - add 1
+else
+// perform addition or subtraction
+If CODE[1], flip the bits in B and assign to Bop so that subtraction can be perfomed
+else
+perform addition
+
+**/ 
+assign Bop = CODE[2] ? (CODE[0] ? 16'hFFFF : 16'h0001) : B[15:0] ^ {16{CODE[1]}};
 
 sumGenerator cla_0(.A(A[3:0]), .B(Bop[3:0]), .Cin(CODE[1]), .sum(C[3:0]), .Cout_final(cla_cout[0]) ); 
 sumGenerator cla_1(.A(A[7:4]), .B(Bop[7:4]), .Cin(cla_cout[0]), .sum(C[7:4]), .Cout_final(cla_cout[1]) );
@@ -24,7 +37,7 @@ always @(*) begin
         // signed addition
         3'b000: begin
             COUT = COE ? 1'bx : cla_cout[3];
-            VOUT = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
+            VOUT = (A[15] & Bop[15] & (~C[15])) | ((~A[15] & ~Bop[15]) & C[15]);
         end
         //Done
         // unsigned addition
@@ -36,7 +49,7 @@ always @(*) begin
         // signed subtraction
         3'b010: begin
             COUT = COE ? 1'bx : cla_cout[3];
-            VOUT = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
+            VOUT = (A[15] & Bop[15] & (~C[15])) | ((~A[15] & ~Bop[15]) & C[15]);
         end
         // unsigned subtraction
         3'b011: begin
@@ -46,12 +59,12 @@ always @(*) begin
         // signed increment
         3'b100: begin
             COUT = COE ? 1'bx : cla_cout[3];
-            VOUT = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
+            VOUT = (A[15] & Bop[15] & (~C[15])) | ((~A[15] & ~Bop[15]) & C[15]);
         end
         //signed decrement
         3'b101: begin
             COUT = COE ? 1'bx : cla_cout[3];
-            VOUT = (A[15] & B[15] & (~C[15])) | ((~A[15] & ~B[15]) & C[15]);
+            VOUT = (A[15] & Bop[15] & (~C[15])) | ((~A[15] & ~Bop[15]) & C[15]);
         end
     endcase
 end

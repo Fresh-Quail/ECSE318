@@ -8,7 +8,8 @@ wire [15:0] Sum_out;
 
 reg [15:0] C;
 reg overflow;
-wire [2:0] code = &alu_code[4:3] ? 3'b010 : alu_code[2:0];
+wire [2:0] code;
+assign code = &alu_code[4:3] ? 3'b010 : alu_code[2:0];
 
 ALU alu(A, B, code, 1'b0, 1'b0, Sum_out, VOUT, COUT); //Cin set to 0 - COE set to 1 (inactive High)
 
@@ -45,33 +46,33 @@ always @(*) begin
                 // ALU alu(A, B, 3'b010, 1'b0, COE, Sum_out, VOUT, COUT); //Subtract B from A
                 // A <= B
                 3'b000: begin 
-                    C = A[15] ^ B[15] ? (A[15]) : ((Sum_out[15]) | ~|Sum_out);
+                    C = {15'b000, A[15] ^ B[15] ? (A[15]) : ((Sum_out[15]) | ~|Sum_out)};
                 end
 
                 3'b001: // A < B
                     // If MSB of A & B are different A[15] ^ B[15] = 1
                     // And B is negative (1), then A > B and A = 1 = B 
-                    C = A[15] ^ B[15] ? (A[15]) : (Sum_out[15]);
+                    C = {15'b000, A[15] ^ B[15] ? (A[15]) : (Sum_out[15])};
 
                 // A >= B
-                3'b010: begin 
+                3'b010: begin
                     // If MSB of A & B are different A[15] ^ B[15] = 1
                     // And B is negative (1), then A > B and A = 1 = B 
                     // ~|Sum_out == A == B
-                    C = A[15] ^ B[15] ? (B[15]) : ~(Sum_out[15]);
+                    C = {15'b000, A[15] ^ B[15] ? (B[15]) : ~(Sum_out[15])};
                 end
                 
                 // A > B
                 3'b011: begin
                     // If MSB of A & B are different A[15] ^ B[15] = 1
                     // And B is negative (1), then A > B and A = 1 = B 
-                    C = A[15] ^ B[15] ? (B[15]) : ~(Sum_out[15]) & |Sum_out;
+                    C = {15'b000, A[15] ^ B[15] ? (B[15]) : ~(Sum_out[15]) & |Sum_out};
                 end
 
                 // A = B
-                3'b100: C = ~|Sum_out;
+                3'b100: C = {15'b000, ~|Sum_out};
                 // A != B
-                3'b101: C = |Sum_out;
+                3'b101: C = {15'b000, |Sum_out};
             endcase
         end
     endcase
