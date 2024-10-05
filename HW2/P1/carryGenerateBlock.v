@@ -1,8 +1,7 @@
-module carryGenerateBlock(
-    input [3:0] P, G,  // propagate and generate
-    input Cin,         // carry-in from first stage (C0)
-    output [3:1] Cout     // carry-out for each stage
-);  
+module carryGenerateBlock(P, G, Cin, Cout);
+    input [3:0] P, G;
+    input Cin;
+    output [3:1] Cout;
 
     //implementing C1 = G0+P0*Cin
     wire c1_result;
@@ -29,6 +28,3 @@ module carryGenerateBlock(
     or third_carry(Cout[3], c3_result[2], c3_result[1], c3_result[0], G[2]);
 
 endmodule
-
-
-

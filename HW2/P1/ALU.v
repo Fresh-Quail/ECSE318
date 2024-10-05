@@ -31,7 +31,7 @@ sumGenerator cla_1(.A(A[7:4]), .B(Bop[7:4]), .Cin(cla_cout[0]), .sum(C[7:4]), .C
 sumGenerator cla_2(.A(A[11:8]), .B(Bop[11:8]), .Cin(cla_cout[1]), .sum(C[11:8]), .Cout_final(cla_cout[2]) );
 sumGenerator cla_3(.A(A[15:12]), .B(Bop[15:12]), .Cin(cla_cout[2]), .sum(C[15:12]), .Cout_final(cla_cout[3]) );
 
-always @(*) begin
+always @(A or B or CODE or CIN or COE) begin
     case(CODE[2:0])
         //Done
         // signed addition

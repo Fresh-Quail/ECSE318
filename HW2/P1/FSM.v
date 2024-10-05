@@ -13,7 +13,7 @@ assign code = &alu_code[4:3] ? 3'b010 : alu_code[2:0];
 
 ALU alu(A, B, code, 1'b0, 1'b0, Sum_out, VOUT, COUT); //Cin set to 0 - COE set to 1 (inactive High)
 
-always @(*) begin
+always @(A or B or alu_code) begin
     case(alu_code[4:3])
         2'b00: begin
             C = Sum_out;

@@ -1,9 +1,8 @@
-module sumGenerator(
-    input [3:0] A, B,   
-    input Cin,          
-    output [3:0] sum,   
-    output Cout_final         
-);
+module sumGenerator(A, B, Cin, sum, Cout_final);
+    input [3:0] A, B;   
+    input Cin;   
+    output [3:0] sum;
+    output Cout_final;
 
     wire [3:0] P, G;    
     wire [3:1] Cout;  
@@ -54,7 +53,3 @@ module sumGenerator(
     or fourth_carry(Cout_final, c4_result[3], c4_result[2], c4_result[1], c4_result[0], G[3]);
 
 endmodule
-
-
-
- 
