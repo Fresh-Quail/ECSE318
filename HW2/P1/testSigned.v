@@ -15,7 +15,7 @@ module testSigned;
 
         // ALU Signed Tests
         initial begin
-            $display("\t\tALU Operations");
+            $display("\t\tSigned ALU Operations");
             A = 27;
             #50 A = -25;
 
@@ -73,7 +73,7 @@ module testSigned;
             B = 2 ** 14 - 2;
             #5;
             A = -(2 ** 14 + 5);
-            B = -(2 ** 14 - 3);
+            B = -(2 ** 14 + 13);
             #5;
         end
 

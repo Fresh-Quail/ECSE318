@@ -14,7 +14,7 @@ module testUnSigned;
 
         // ALU Tests
         initial begin
-            $display("\t\tALU Operations");
+            $display("\t\tUnsigned ALU Operations");
             A = 27;
                 forever begin
                     #5 A = A + 5;

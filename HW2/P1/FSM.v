@@ -8,12 +8,13 @@ wire [15:0] Sum_out;
 
 reg [15:0] C;
 reg overflow;
+reg [15:0] shift_result;
+
 wire [2:0] code;
 assign code = &alu_code[4:3] ? 3'b010 : alu_code[2:0];
-
 ALU alu(A, B, code, 1'b0, 1'b0, Sum_out, VOUT, COUT); //Cin set to 0 - COE set to 1 (inactive High)
 
-always @(A or B or alu_code) begin
+always @(*) begin
     case(alu_code[4:3])
         2'b00: begin
             C = Sum_out;
@@ -33,10 +34,14 @@ always @(A or B or alu_code) begin
         2'b10: begin
             overflow = 1'b0;
             case(alu_code[2:0])
-                3'b000: C = A << B[3:0];
-                3'b001: C = A >> B[3:0];
-                3'b010: C = {A[15], A[13:0], 1'b0}; // A <<< B[3:0];
-                3'b011: C = {A[15], A[15:1]}; // C = A >>> B[3:0];
+                3'b000: C = A[15:0] << B[3:0];
+                3'b001: C = A[15:0] >> B[3:0];
+                3'b010: C = {A[15], A[14:0] << B[3:0]}; // A <<< B[3:0];
+                3'b011: begin
+                    shift_result = A >> B[3:0];
+                    assign C = A & 16'h8000 ? shift_result | (16'hFFFF << (16-B[3:0])) : A >> B[3:0];
+                    
+                end
             endcase
         end
 
