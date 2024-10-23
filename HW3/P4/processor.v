@@ -41,14 +41,14 @@ always @(posedge clock) begin
         // IR[11:0] destination, only need 4 bits
         // IR[27] source type
         regFile[IR[3:0]] = IR[27] ? IR[23:12] : mem[IR[23:12]];
-        PSR[0] = 1'b0;
+        PSR = 5'b11110;
         PC = PC + 1;
     end
     
     4'b0010: begin // STORE
         // Only need 4 bits for reg
         mem[IR[11:0]] = IR[27] ? IR[23:12] : regFile[IR[15:12]];
-        PSR[0] = 1'b0;
+        PSR = 5'b00000;
         PC = PC + 1;
     end
     
@@ -72,12 +72,13 @@ always @(posedge clock) begin
         // IR[27] == 1 -> immediate : register
         // Only need 4 bits for reg
         regFile[IR[3:0]] = IR[27] ? regFile[IR[3:0]] ^ IR[23:12] : regFile[IR[3:0]] ^ regFile[IR[15:12]];
-        PSR[0] = 1'b0;
+        PSR = 5'b11110;
         PC = PC + 1;
     end
     
     4'b0101: begin // ADD
-        {PSR[0], regFile[IR[3:0]]} = IR[27] ? regFile[IR[3:0]] + IR[23:12] : regFile[IR[3:0]] + IR[23:12]; 
+        regFile[IR[3:0]] = IR[27] ? regFile[IR[3:0]] + IR[23:12] : regFile[IR[3:0]] + IR[23:12]; 
+        PSR = 5'b11111;
         PC = PC + 1;
     end
     
@@ -85,12 +86,14 @@ always @(posedge clock) begin
         // IR[23] == 1 ? left : right
         regFile[IR[3:0]] = IR[23] ? regFile[IR[3:0]] << IR[22:12] | regFile[IR[3:0]] >> 5'b11111 - IR[22:12] : 
             regFile[IR[3:0]] >> IR[22:12] | regFile[IR[3:0]] << 5'b11111 - IR[22:12];
+        PSR = 5'b11111;
         PC = PC + 1;
     end
     
     4'b0111: begin // SHIFT
         // IR[23] == 1 ? left : right
         regFile[IR[3:0]] = IR[23] ? regFile[IR[3:0]] << IR[22:12] : regFile[IR[3:0]] >> IR[22:12];  
+        PSR = 5'b11111;
         PC = PC + 1;
     end
     
@@ -100,9 +103,9 @@ always @(posedge clock) begin
     
     4'b1001: begin // COMPLEMENT
         regFile[IR[3:0]] = IR[27] ? ~IR[23:12] : ~regFile[IR[15:12]]; 
+        PSR = 5'b11110;
         PC = PC + 1;
     end
-    
     endcase
 
 end
