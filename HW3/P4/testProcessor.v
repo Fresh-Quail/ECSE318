@@ -1,25 +1,14 @@
 module testProcessor;
-	reg [15:0] clk;
-	wire [15:0] C;
-    
+    reg clock;
+    wire [11:0] PC;
 
-        initial begin
-            $display("\t\tTime | A | B | OUT | CODE");
-            $monitor($time,,"%b, %b, %b, %b", A, B, C, alu_code);
-            #20;
-        $finish;
-        end
+    processor proc(clock, PC);
 
-        // ALU Tests
-        initial begin
+    initial begin
+        clock = 0;
+    end
 
-        end
-
-        initial begin
-
-        end
-
-        initial begin
-            
-        end
+    always begin
+        #5 clock = ~clock;
+    end
 endmodule
