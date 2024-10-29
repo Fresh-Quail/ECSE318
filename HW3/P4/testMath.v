@@ -10,19 +10,20 @@ initial begin
     $finish;
 end
 
-always @(proc.regFile[2] or proc.mem.mem[2]) begin
-    $display("REG2: %d", proc.regFile[2]);
-end
     initial begin
         proc.PC = 4095 - 21;
         proc.mem.math(10, 29);
         clock = 0;
 
-        #(30*50 + 2*60 + 40);
+        #(30*50 + 2*60 + 170);
         proc.PC = 4095 - 21;
         proc.mem.math(0, 100);
 
-        #(32*60 + 40);
+        #(32*50 + 170);
+        proc.PC = 4095 - 21;
+        proc.mem.math(0, 0);
+
+        #(32*50 + 170);
         proc.PC = 4095 - 21;
         proc.mem.math(1, 4235);
     end
