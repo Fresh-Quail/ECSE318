@@ -49,66 +49,82 @@ localparam ZRO = 3'b101;
 localparam NCA = 3'b110;
 localparam POS = 3'b111;
 
-initial begin
-    mem[0] = 1;
-    mem[1] = 2;
-    mem[2] = 3;
-    mem[3] = 4;
-    mem[4] = 5;
-    mem[5] = 6;
-    mem[6] = 7;
-    mem[7] = 8;
-    mem[8] = 9;
-    mem[9] = 10;
-    mem[10] = 11;
-    mem[11] = 12;
+task reverse;
+    begin
+        mem[0] = 1;
+        mem[1] = 2;
+        mem[2] = 3;
+        mem[3] = 4;
+        mem[4] = 5;
+        mem[5] = 6;
+        mem[6] = 7;
+        mem[7] = 8;
+        mem[8] = 9;
+        mem[9] = 10;
+        mem[10] = 11;
+        mem[11] = 12;
 
+        // OPCODE, SOURCE TYPE, CC, SOURCE ADD/IMM VAL, DEST ADDR
+        mem[4095 - 34] = {LD, 1'b1, ALW, 12'b1, REG6};          // REG6 = 1
+        mem[4095 - 33] = {CMP, 1'b0, ALW, REG6, REG6};          // CMP REG6
+        mem[4095 - 32] = {ADD, 1'b1, ALW, 12'b1, REG6};         // REG6 = -1
+        mem[4095 - 31] = {LD, 1'b1, ALW, 12'b0101, REG0};       // REG0 = 5
+        mem[4095 - 30] = {LD, 1'b1, ALW, 12'b0, REG1};          // REG1 = 0
+        mem[4095 - 29] = {LD, 1'b1, ALW, 12'b01011, REG2};      // REG2 = 11
+        mem[4095 - 28] = {LD, 1'b1, ALW, 12'b111111100100, REG5};       // REG5 = ADDR
 
-    // OPCODE, SOURCE TYPE, CC, SOURCE ADD/IMM VAL, DEST ADDR
+        mem[4095 - 27] = {LD, 1'b0, ALW, REG1, REG3};          // REG3 = mem[REG1]
+        mem[4095 - 26] = {LD, 1'b0, ALW, REG2, REG4};          // REG4 = mem[REG2]
+        mem[4095 - 25] = {STR, 1'b0, ALW, REG3, REG2};         // MEM[REG2] = REG3
+        mem[4095 - 24] = {STR, 1'b0, ALW, REG4, REG1};         // MEM[REG1] = REG4
 
-    mem[4095 - 31] = {LD, 1'b1, ALW, 12'b0110, REG0};       // REG0 = 6
-    mem[4095 - 30] = {LD, 1'b1, ALW, 12'b0, REG1};          // REG1 = 0
-    mem[4095 - 29] = {LD, 1'b1, ALW, 12'b01011, REG2};      // REG2 = 11
-    mem[4095 - 28] = {LD, 1'b1, 3'b0, 12'b111111100100, REG5};       // REG5 = ADDR
+        mem[4095 - 23] = {ADD, 1'b1, ALW, 12'b1, REG1};         // REG1 = REG1 + 1
+        mem[4095 - 22] = {ADD, 1'b0, ALW, REG6, REG2};          // REG2 = REG2 - 1
+        mem[4095 - 21] = {ADD, 1'b0, ALW, REG6, REG0};          // REG0 = REG0 - 1
 
-    mem[4095 - 27] = {LD, 1'b0, 3'b0, REG1, REG3};          // REG3 = mem[REG1]
-    mem[4095 - 26] = {LD, 1'b0, 3'b0, REG2, REG4};          // REG4 = mem[REG2]
-    mem[4095 - 25] = {STR, 1'b0, 3'b0, REG3, REG2};         // MEM[REG2] = REG3 
-    mem[4095 - 24] = {STR, 1'b0, 3'b0, REG4, REG1};         // MEM[REG1] = REG4
+        mem[4095 - 20] = {BRA, 1'b0, POS, 12'b0, REG5};     // BRANCH to REG5 on REG0 >= 0
+        mem[4095 - 19] = {HLT, 1'b0, ALW, 12'b0, 12'b0};    // Halt
+        mem[4095 - 18] = {BRA, 1'b0, POS, 12'b0, REG5};     // BRANCH to REG5 on REG0 >= 0
+    end
+endtask
 
-    mem[4095 - 23] = {ADD, 1'b1, 3'b0, 12'b111111111111, REG0};     // REG0 = REG0 - 1
-    mem[4095 - 23] = {ADD, 1'b1, 3'b0, 12'b111111111111, REG2};     // REG2 = REG2 - 1
-    mem[4095 - 23] = {ADD, 1'b1, 3'b0, 12'b1, REG1};                // REG1 = REG1 + 1
+task math;
+input [31:0] A, B;
+    begin
+        mem[0] = A;
+        mem[1] = B;
+        
+        mem[4095 - 21] = {LD, 1'b1, ALW, 12'b0, REG2};   // REG6 = 1
+        mem[4095 - 20] = {LD, 1'b1, ALW, 12'b1, REG6};   // REG6 = 1
+        mem[4095 - 19] = {CMP, 1'b0, ALW, REG6, REG6};   // CMP REG2
+        mem[4095 - 18] = {ADD, 1'b1, ALW, 12'b1, REG6};  // REG6 = -1
+ 
+        mem[4095 - 17] = {LD, 1'b1, ALW, 12'b011111, REG7};  // REG7 = 31 ---> Counter 
+ 
+        mem[4095 - 16] = {LD, 1'b1, ALW, 12'b0, REG3};   // Save Address to mem[0] {STR mem, src}, mem must be a register? cannot be an immediate value pointing to a memory address
+        mem[4095 - 15] = {LD, 1'b1, ALW, 12'b1, REG4};   // Save Address to mem[1] {STR mem, src}
+        mem[4095 - 14] = {LD, 1'b1, ALW, 12'b10, REG5};   // Save Address to mem[2] {STR mem, src}
+         
+        mem[4095 - 13] = {LD, 1'b1, ALW, 12'b111111111010, REG8};   // Address for first branch
+        mem[4095 - 12] = {LD, 1'b1, ALW, 12'b111111110111, REG9};   // Address for second branch
+ 
+        mem[4095 - 11] = {LD, 1'b0, ALW, REG3, REG0};   //REG0 = A -> mem[REG3];
+        mem[4095 - 10] = {LD, 1'b0, ALW, REG4, REG1};   //REG1 = B -> mem[REG4];
+        mem[4095 - 9] = {ADD, 1'b1, ALW, 12'b10, REG1}; //REG1 = REG1 + 2;
+ 
+        mem[4095 - 8] = {SHF, 1'b0, ALW, 12'b111111111111, REG0};      //REG0 << 1;
+        mem[4095 - 7] = {BRA, 1'b0, NCA, 12'b0, REG8};      //Branch on REG0 -> No Carry
+        mem[4095 - 6] = {ADD, 1'b0, ALW, REG1, REG2};       //REG2 = REG2 + REG1;
+        mem[4095 - 5] = {SHF, 1'b0, ALW, 12'b111111111111, REG2};      //REG2 << 1;
+ 
+        mem[4095 - 4] = {ADD, 1'b0, ALW, REG6, REG7};       // REG7 = REG7 + REG6
+        mem[4095 - 3] = {BRA, 1'b0, POS, 12'b0, REG9};      //Branch on REG7
+        mem[4095 - 2] = {SHF, 1'b1, ALW, 12'b1, REG2};      //REG2 >> 1; Unshift last shift (unnecessary)
 
-    mem[4095 - 21] = {BRA, 1'b0, ZRO, 12'b0, REG5};     // BRANCH on REG0 = 0
-    mem[4095 - 20] = {HLT, 1'b0, 3'b0, 12'b0, 12'b0};   // Halt
-    mem[4095 - 22] = {BRA, 1'b0, ZRO, 12'b0, REG5};     // BRANCH on REG0 = 0
+        mem[4095 - 1] = {STR, 1'b0, ALW, REG2, REG5}; // mem[REG] = REG5;
 
-    // mem[4095 - 20] = {STR, 1'b0, 3'b0, 12'b0, 12'b01011}; // MEM[9] = REG0
-    // mem[4095 - 19] = {STR, 1'b0, 3'b0, 12'b1, 12'b00000}; // MEM[2] = REG1
-
-    // mem[4095 - 18] = {LD, 1'b0, 3'b0, 12'b00011, 12'b0};      // REG0 = mem[3]
-    // mem[4095 - 17] = {LD, 1'b0, 3'b0, 12'b01011, 12'b1};  // REG1 = mem[8]
-    // mem[4095 - 16] = {STR, 1'b0, 3'b0, 12'b0, 12'b01011}; // MEM[8] = REG0
-    // mem[4095 - 15] = {STR, 1'b0, 3'b0, 12'b1, 12'b00000}; // MEM[3] = REG1
-
-    // mem[4095 - 14] = {LD, 1'b0, 3'b0, 12'b00100, 12'b0};      // REG0 = mem[4]
-    // mem[4095 - 13] = {LD, 1'b0, 3'b0, 12'b01011, 12'b1};  // REG1 = mem[7]
-    // mem[4095 - 12] = {STR, 1'b0, 3'b0, 12'b0, 12'b01011}; // MEM[7] = REG0
-    // mem[4095 - 11] = {STR, 1'b0, 3'b0, 12'b1, 12'b00000}; // MEM[4] = REG1
-
-    // mem[4095 - 10] = {LD, 1'b0, 3'b0, 12'b101, 12'b0};      // REG0 = mem[5]
-    // mem[4095 - 9] = {LD, 1'b0, 3'b0, 12'b01011, 12'b1};  // REG1 = mem[6]
-    // mem[4095 - 8] = {STR, 1'b0, 3'b0, 12'b0, 12'b01011}; // MEM[6] = REG0
-    // mem[4095 - 7] = {STR, 1'b0, 3'b0, 12'b1, 12'b00000}; // MEM[5] = REG1
-
-end
-
-
-initial begin
-    $display("\t\tTime | mem0 | mem0 | mem0 | mem0 | mem0 | mem0 | mem0 | mem0 | mem0 | mem0 | mem0 | mem0");
-    $monitor($time,,"%b: %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d", clock, mem[0], mem[1], mem[2], mem[3], mem[4], mem[5], mem[6], mem[7], mem[8], mem[9], mem[10], mem[11]);
-    #1000;
-    $finish;
-end
+        mem[4095] = {HLT, 1'b0, ALW, 12'b0, 12'b0}; // HALT
+        // mem[4095] = {BRA, 1'b0, ALW, 12'b0, REG8}; //Branch on REG0 > 0; ---> Test HALT
+    end
+endtask
 endmodule
