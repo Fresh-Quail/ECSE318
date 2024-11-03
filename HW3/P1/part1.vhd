@@ -1,16 +1,16 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-entity part2 is
+entity part1 is
     port ( 
         A, B : in std_logic_vector(1 downto 0);
         Cin  : in std_logic;
         C : out std_logic;
         S : out std_logic_vector(1 downto 0)
     );
-end entity part2;
+end entity part1;
 
-architecture structural of part2 is
+architecture structural of part1 is
     signal carry : std_logic_vector(2 downto 0);
     signal sums : std_logic_vector(1 downto 0);
 begin

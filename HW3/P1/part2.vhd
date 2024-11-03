@@ -15,7 +15,8 @@ architecture structural of part2 is
     signal sums     : std_logic_vector(1 downto 0);
 begin
 
-    fullAdder00: entity work.FA     -- First stage adder when the carry in is zero
+    fullAdder00: entity work.FA     
+    -- First stage adder when the carry in is zero
         port map(
             A => A(0),
             B => B(0),  
@@ -24,7 +25,8 @@ begin
             S => S(0)
         );
         
-    fullAdder01: entity work.FA     -- First stage adder when the carry in is one
+    fullAdder01: entity work.FA     
+    -- First stage adder when the carry in is one
         port map(
             A => A(0),
             B => B(0),  
@@ -33,7 +35,8 @@ begin
             S => S(2)
         );
 
-    fullAdder10: entity work.FA     -- Second stage adder when the carry in is zero
+    fullAdder10: entity work.FA     
+    -- Second stage adder when the carry in is zero
         port map(
             A => A(1),
             B => B(1),  
@@ -42,7 +45,8 @@ begin
             S => sums(0)
         );
 
-    fullAdder11: entity work.FA     -- Second stage adder when the carry in is one
+    fullAdder11: entity work.FA     
+    -- Second stage adder when the carry in is one
         port map(
             A => A(1),
             B => B(1),  

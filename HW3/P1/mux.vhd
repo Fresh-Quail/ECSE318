@@ -3,7 +3,7 @@ library IEEE;
 
 entity mux is 
     generic (
-         N : integer := 1
+         N : integer := 2
     );
     port (
         sel : in std_logic;
@@ -35,6 +35,12 @@ entity mux1bit is
 end entity mux1bit;
 
 architecture structural of mux is
+begin 
+    cout <= B when sel = '1' else A;
+    sout <= D when sel = '1' else C;
+end structural;
+
+architecture structural of mux1bit is
 begin 
     cout <= B when sel = '1' else A;
     sout <= D when sel = '1' else C;
