@@ -1,29 +1,41 @@
 library IEEE;
   use IEEE.STD_LOGIC_1164.ALL;
-  use IEEE.STD_LOGIC_ARITH.ALL;
-  use IEEE.STD_LOGIC_UNSIGNED.ALL;
-
 
 entity mux is 
-    
-
+    generic (
+         N : integer := 1
+    );
     port (
-        sel : in STD_LOGIC; 
-        A : in STD_LOGIC; 
-        B : in STD_LOGIC; 
-        mux_out : out STD_LOGIC
+        sel : in std_logic;
+        A : in std_logic; 
+        B : in std_logic; 
+        C : in STD_LOGIC_VECTOR(N-1 downto 0); 
+        D : in STD_LOGIC_VECTOR(N-1 downto 0); 
+        Cout : out std_logic;
+        Sout : out STD_LOGIC_VECTOR(N-1 downto 0) 
     );
 end entity mux;
 
-architecture structural of mux is
-begin
-    process (sel, A, B) is
-begin 
-    if (sel = '1') then 
-        mux_out <= B;
-    else 
-        mux_out <= A;
-    end if;
-end process;
-end structural;
+library IEEE;
+  use IEEE.STD_LOGIC_1164.ALL;
+  
+entity mux1bit is 
+    generic (
+         N : integer := 1
+    );
+    port (
+        sel : in std_logic;
+        A : in std_logic; 
+        B : in std_logic; 
+        C : in std_logic; 
+        D : in std_logic; 
+        Cout : out std_logic;
+        Sout : out std_logic 
+    );
+end entity mux1bit;
 
+architecture structural of mux is
+begin 
+    cout <= B when sel = '1' else A;
+    sout <= D when sel = '1' else C;
+end structural;
