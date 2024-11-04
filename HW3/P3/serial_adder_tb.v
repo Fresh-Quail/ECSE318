@@ -1,20 +1,21 @@
 module serial_adder_tb;
 
-    // Inputs
+    
     reg clear;
     reg set;
     reg clk;
     reg [7:0] addend;
     reg [7:0] augand;
 
-    // Outputs
+    
     wire addend_output;
     wire augand_output;
     wire sum_output;
     wire Cin;
     wire Cout;
+    wire sum_reg;
 
-    // Instantiate the Unit Under Test (UUT)
+    // uut
     serial_adder uut (
         .clear(clear),
         .set(set),
@@ -24,59 +25,60 @@ module serial_adder_tb;
         .addend_output(addend_output),
         .augand_output(augand_output),
         .sum_output(sum_output),
+        .sum_register(sum_reg),
         .C_in(Cin),
         .Cout(Cout)
     );
 
-    // Clock generation
+    
     initial begin
         clk = 0;
-        forever #5 clk = ~clk; // 10 ns clock period
+        forever #5 clk = ~clk; 
     end
 
-    // Test sequence
+    
     initial begin
-        // Initialize inputs
-        clear = 1;    // Start with clear inactive (high)
-        set = 1;      // Start with set inactive (high)
+        
+        clear = 1;    
+        set = 1;     
 
-        // Apply clear and set signals to reset the design
-        #10 clear = 0;  // Assert clear (active low) to reset the design
-        #20 clear = 1;  // Release clear (inactive high)
+        //reset the design
+        #10 clear = 0;  
+        #20 clear = 1;  
 
-        // Test case 1: 6 + 4
-        addend = 8'b00000110;  // 6 in binary
-        augand = 8'b00000100;  // 4 in binary
-        #10 set = 0;            // Assert set (active low) to enable shifting
-        #100 set = 1;           // Deactivate set after the shift to stop shifting
+        // test case: 6+4
+        addend = 8'b00000110;  
+        augand = 8'b00000100; 
+        #10 set = 0;            
+        #100 set = 1;          
 
-        // Apply clear to reset the design before the next test case
+        //reset the design before the next test case
+        // test case : 7+3
         #20 clear = 0;  
-        addend = 8'b00000111;  // 7 in binary
-        augand = 8'b00000011;         // Assert clear to reset
-        #60 clear = 1;          // Release clear
+        addend = 8'b00000111;  
+        augand = 8'b00000011;         
+        #55 clear = 1;          
 
-        // Test case 2: 7 + 3
-       // addend = 8'b00000111;  // 7 in binary
-        //augand = 8'b00000011;  // 3 in binary
-        set = 0;            // Assert set (active low) to enable shifting
-        #200 set = 1;           // Deactivate set after the shift to stop shifting
+        // test case: 6+4
+        set = 0;            
+        #200 set = 1;           
         #20 clear = 0;
-        addend = 8'b00000110;  // 6 in binary
-        augand = 8'b00000110; 
+        addend = 8'b00000110;  
+        augand = 8'b00000100; 
         #40 set = 0;
         clear =1;
         
         #140;
 
         #50;
-        $finish;  // End of simulation
+        $finish;  
     end
 
-    // Monitor outputs
+    
     initial begin
         $monitor("Time = %0dns, clk = %b, set = %b, clear = %b, addend_output = %b, augand_output = %b, sum_output = %b, Cin = %b, Cout = %b", 
-                 $time, clk, set, clear, addend_output, augand_output, sum_output, Cin, Cout);
+                 $time, clk, set, clear, addend_output, augand_output, sum_output, sum_reg, Cin, Cout);
     end
+   
 
 endmodule
