@@ -94,7 +94,7 @@ input [31:0] A, B;
         mem[0] = A;
         mem[1] = B;
         
-        mem[4095 - 21] = {LD, 1'b1, ALW, 12'b0, REG2};   // REG6 = 1
+        mem[4095 - 21] = {LD, 1'b1, ALW, 12'b0, REG2};   // REG2 = 0
         mem[4095 - 20] = {LD, 1'b1, ALW, 12'b1, REG6};   // REG6 = 1
         mem[4095 - 19] = {CMP, 1'b0, ALW, REG6, REG6};   // CMP REG2
         mem[4095 - 18] = {ADD, 1'b1, ALW, 12'b1, REG6};  // REG6 = -1
@@ -121,10 +121,27 @@ input [31:0] A, B;
         mem[4095 - 3] = {BRA, 1'b0, POS, 12'b0, REG9};      //Branch on REG7
         mem[4095 - 2] = {SHF, 1'b1, ALW, 12'b1, REG2};      //REG2 >> 1; Unshift last shift (unnecessary)
 
-        mem[4095 - 1] = {STR, 1'b0, ALW, REG2, REG5}; // mem[REG] = REG5;
+        mem[4095 - 1] = {STR, 1'b0, ALW, REG2, REG5}; // mem[REG5] = REG2;
 
         mem[4095] = {HLT, 1'b0, ALW, 12'b0, 12'b0}; // HALT
         // mem[4095] = {BRA, 1'b0, ALW, 12'b0, REG8}; //Branch on REG0 > 0; ---> Test HALT
+    end
+endtask
+
+task complement;
+input [31:0] N;
+    begin
+        mem[0] = N;
+
+        mem[4095 - 7] = {LD, 1'b1, ALW, 12'b0, REG1};  // REG1 = 1 -> reference to memory location 0
+        mem[4095 - 6] = {LD, 1'b0, ALW, REG1, REG0};  // REG0 = mem[REG1]
+        mem[4095 - 5] = {CMP, 1'b0, ALW, REG0, REG0};  // CMP REG0
+        mem[4095 - 4] = {ADD, 1'b1, ALW, 12'b1, REG0}; // REG0 = REG0 + 1 -> -N
+
+        mem[4095 - 3] = {LD, 1'b1, ALW, 12'b1, REG1};  // REG1 = 1 -> reference to memory location 1
+        mem[4095 - 2] = {STR, 1'b0, ALW, REG0, REG1};   //mem[1] = REG0
+        mem[4095 - 1] = {HLT, 1'b0, ALW, 12'b0, 12'b0};     // HALT
+        mem[4095] = {STR, 1'b1, ALW, REG1, REG1};   // Test Halt instruction
     end
 endtask
 endmodule
