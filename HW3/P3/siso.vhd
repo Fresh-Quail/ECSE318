@@ -6,20 +6,20 @@ library IEEE;
   entity siso is 
     port(clk: in STD_LOGIC;
         set: in STD_LOGIC;
-        reset: in STD_LOGIC;
+        clear: in STD_LOGIC;
         siso_input: in STD_LOGIC;
         siso_output: out STD_LOGIC);
     end entity siso;
 
     architecture behavioral of siso is
-        signal qq : STD_LOGIC_VECTOR(7 downto 0) := (others => '0') ;
+        signal qq : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
 
         begin
         siso_output <= qq(7);
 
-    process(clk, reset, set)
+    process(clk, clear, set)
     begin
-        if (reset = '0') then
+        if (clear = '0') then
             qq <= (others => '0');
         else if (set = '0') then 
             if rising_edge(clk) then

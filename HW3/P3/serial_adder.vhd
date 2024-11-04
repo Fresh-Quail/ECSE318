@@ -48,8 +48,8 @@ architecture behavioral of serial_adder is
         port(
         clk: in STD_LOGIC;
         data: in STD_LOGIC_VECTOR(7 downto 0);
-        reset: in STD_LOGIC;
-        enable: in STD_LOGIC;
+        clear: in STD_LOGIC;
+        set: in STD_LOGIC;
         piso_output: out STD_LOGIC);
     end component;
 
@@ -57,7 +57,7 @@ architecture behavioral of serial_adder is
         port(
         clk: in STD_LOGIC;
         set : in STD_LOGIC;
-        reset: in STD_LOGIC;
+        clear: in STD_LOGIC;
         siso_input: in STD_LOGIC;
         siso_output: out STD_LOGIC);
     end component;
@@ -77,16 +77,16 @@ architecture behavioral of serial_adder is
         port map(
             clk => clk,
             data => addend,
-            reset => clear,
-            enable => set, 
+            clear => clear,
+            set => set, 
             piso_output => addend_wire);
 
             augand_reg: piso
             port map(
                 clk => clk,
                 data => augand,
-                reset => clear,
-                enable => set, 
+                clear => clear,
+                set => set, 
                 piso_output => augand_wire);
             
         flip_flop: d_flip_flop
@@ -102,7 +102,7 @@ architecture behavioral of serial_adder is
         port map(
         clk => clk,
         set => set,
-        reset => clear, 
+        clear => clear, 
         siso_input => sum_reg,
         siso_output => sum_output
         );

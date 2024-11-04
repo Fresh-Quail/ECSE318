@@ -7,8 +7,8 @@ library IEEE;
   entity piso is 
     port(clk: in STD_LOGIC;
         data: in STD_LOGIC_VECTOR(7 downto 0);
-        reset: in STD_LOGIC;
-        enable: in STD_LOGIC;
+        clear: in STD_LOGIC;
+        set: in STD_LOGIC;
         piso_output: out STD_LOGIC);
     end entity piso;
 
@@ -16,12 +16,12 @@ library IEEE;
         signal memory : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
 
     begin 
-        process(clk, reset, enable)
+        process(clk, clear, set)
         begin 
-            if (reset = '0') then
+            if (clear = '0') then
                 piso_output <= '0';
                 memory <= data;
-            else if enable = '0'  then
+            else if set = '0'  then
                 if rising_edge(clk) then
                     piso_output <= memory(0);
                     
@@ -31,4 +31,3 @@ library IEEE;
             end if;
         end process;
     end behavioral;
-
