@@ -10,6 +10,7 @@ initial begin
     $finish;
 end
     initial begin
+	proc.PC = 4095 - 34;
         proc.mem.reverse();
         clock = 0;
     end
