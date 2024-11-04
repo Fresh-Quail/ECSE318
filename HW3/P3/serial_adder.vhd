@@ -6,14 +6,15 @@ library IEEE;
   entity serial_adder is 
     
     port (
-        clear: in STD_LOGIC;
-        set: in STD_LOGIC;
+        clear: in STD_LOGIC;        --active low
+        set: in STD_LOGIC;            --active low
         clk : in STD_LOGIC;
         addend : in STD_LOGIC_VECTOR (7 downto 0); 
         augand : in STD_LOGIC_VECTOR(7 downto 0); 
         addend_output: out STD_LOGIC;
         augand_output: out STD_LOGIC;
-        sum_output : out STD_LOGIC;
+        sum_output : out STD_LOGIC;               -- output of SISO register
+        sum_register: out STD_LOGIC;           -- output of the full adder
         C_in : out STD_LOGIC;
         Cout:  out STD_LOGIC
     );
@@ -21,14 +22,14 @@ end entity serial_adder;
 
 architecture behavioral of serial_adder is
     
-    --signal
+    --signal to connect the components
     signal augand_wire: STD_LOGIC := '0';
     signal addend_wire: STD_LOGIC := '0';
     signal cin : STD_LOGIC := '0';
     signal cout_temp : STD_LOGIC := '0';
     signal sum_reg: STD_LOGIC := '0';
 
-
+    --full adder
     component FA is 
         port (
             A : in STD_LOGIC;
@@ -38,26 +39,26 @@ architecture behavioral of serial_adder is
             S : out STD_LOGIC
         );
         end component;
-
+        --d flip flop
     component d_flip_flop is 
         port(d, clk, set, clear: in STD_LOGIC;
             q: out STD_LOGIC);
         end component;
-
+        -- registers to hold input data
     component piso is 
         port(
         clk: in STD_LOGIC;
         data: in STD_LOGIC_VECTOR(7 downto 0);
-        clear: in STD_LOGIC;
-        set: in STD_LOGIC;
+        reset: in STD_LOGIC;
+        enable: in STD_LOGIC;
         piso_output: out STD_LOGIC);
     end component;
-
+    --registers to hold the output data
     component siso is 
         port(
         clk: in STD_LOGIC;
         set : in STD_LOGIC;
-        clear: in STD_LOGIC;
+        reset: in STD_LOGIC;
         siso_input: in STD_LOGIC;
         siso_output: out STD_LOGIC);
     end component;
@@ -77,16 +78,16 @@ architecture behavioral of serial_adder is
         port map(
             clk => clk,
             data => addend,
-            clear => clear,
-            set => set, 
+            reset => clear,
+            enable => set, 
             piso_output => addend_wire);
 
             augand_reg: piso
             port map(
                 clk => clk,
                 data => augand,
-                clear => clear,
-                set => set, 
+                reset => clear,
+                enable => set, 
                 piso_output => augand_wire);
             
         flip_flop: d_flip_flop
@@ -102,17 +103,18 @@ architecture behavioral of serial_adder is
         port map(
         clk => clk,
         set => set,
-        clear => clear, 
+        reset => clear, 
         siso_input => sum_reg,
         siso_output => sum_output
         );
 
+        -- these assignments are used later for waveforms in the testbench
         addend_output <= addend_wire;
     augand_output <= augand_wire;
 
     Cout <= cout_temp;
     C_in <= cin;
-       
+    sum_register <= sum_reg;   
         
         end architecture behavioral;
         
