@@ -8,26 +8,33 @@ output [7:0] PRDATA;
 wire [7:0] Tx, Rx;
 wire tready;
 
-reg SSPCLKOUT = 1'b0;	
-reg SSPTXD, SSPOE_B, rwrite;
+reg SSPCLKOUT, SSPTXD, SSPOE_B, SSPFSSOUT;
 reg [3:0] tcount, rcount;
 reg [7:0] TxData, RxData;
+reg rwrite;
 
-reg SSPFSSOUT;
-
-FIFO TxFIFO(PSEL, PWRITE, CLEAR_B, PCLK, PWDATA, Tx, tready);
-FIFO RxFIFO(PSEL, PWRITE, CLEAR_B, PCLK, RxData, PRDATA, rwrite);
+FIFO TxFIFO(PSEL, PWRITE, CLEAR_B, PCLK, PWDATA, Tx, SSPTXINTR, tready, SSPFSSOUT);
+FIFO RxFIFO(PSEL, PWRITE, CLEAR_B, PCLK, RxData, PRDATA, SSPRXINTR, rwrite);
 
 always @(posedge PCLK) begin
 	if (~CLEAR_B) begin
 	// Initialize output inactive high and counts
+		SSPCLKOUT = 1'b0;
 		SSPOE_B = 1'b1;
 		tcount = 4'b0111;
 		rcount = 4'b0111;
 		rwrite = 1'b0;
+		tread = 1'b0;
 	end 
 	// Clock Logic - Half as fast
 	SSPCLKOUT = ~SSPCLKOUT;		// Making clock flip every posedge of PCLK
+end
+
+always @(negedge PCLK) begin
+	// Must read data in sync with FIFO when data is ready
+	// On the negedge, must be ready on posedge for SSPCLKOUT
+	if(SSPFSSOUT)		//If data is valid and we want to read in
+		TxData = Tx;
 end
 
 always @ (posedge SSPCLKOUT) begin
@@ -44,10 +51,9 @@ always @ (posedge SSPCLKOUT) begin
 end
 
 always @(negedge SSPCLKOUT) begin
-	// If transmit data ready, enable output and initialize/load registers
+	// If transmit data ready, enable output and initialize registers
 	if (SSPFSSOUT) begin
 		SSPOE_B = 1'b0;
-		TxData = Tx;		
 		tcount = 4'b0111;
 	end 
 	else if(tcount[3])
