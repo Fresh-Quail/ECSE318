@@ -22,7 +22,7 @@ always @ (posedge PCLK) begin
 		if(PWRITE) begin
 			if(~SSPTXINTR) begin	// If not full, write
 				memory[wrtptr] = IN_DATA;
-				wrtprt = wrtptr + 2'b1;
+				wrtptr = wrtptr + 2'b1;
 			end
 			//After addition, check if wrtprt if equal to readptr
 			//If so, FIFO is full (if after write ptrs are equal fifo is full)

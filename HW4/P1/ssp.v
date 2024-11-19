@@ -6,25 +6,24 @@ output SSPOE_B, SSPTXD, SSPCLKOUT, SSPFSSOUT, SSPTXINTR, SSPRXINTR;
 output [7:0] PRDATA;
 
 wire [7:0] Tx, Rx;
-wire tready;
 
 reg SSPCLKOUT, SSPTXD, SSPOE_B, SSPFSSOUT;
 reg [3:0] tcount, rcount;
 reg [7:0] TxData, RxData;
 reg rwrite;
 
-FIFO TxFIFO(PSEL, PWRITE, CLEAR_B, PCLK, PWDATA, Tx, SSPTXINTR, tready, SSPFSSOUT);
-FIFO RxFIFO(PSEL, PWRITE, CLEAR_B, PCLK, RxData, PRDATA, SSPRXINTR, rwrite);
+TxFIFO TxFIFO(PSEL, PWRITE, CLEAR_B, PCLK, PWDATA, Tx, SSPTXINTR, tready, SSPFSSOUT);
+RxFIFO RxFIFO(PSEL, PWRITE, CLEAR_B, PCLK, RxData, PRDATA, SSPRXINTR, rwrite);
 
 always @(posedge PCLK) begin
 	if (~CLEAR_B) begin
 	// Initialize output inactive high and counts
 		SSPCLKOUT = 1'b0;
+		SSPFSSOUT = 1'b0;
 		SSPOE_B = 1'b1;
 		tcount = 4'b0111;
 		rcount = 4'b0111;
 		rwrite = 1'b0;
-		tread = 1'b0;
 	end 
 	// Clock Logic - Half as fast
 	SSPCLKOUT = ~SSPCLKOUT;		// Making clock flip every posedge of PCLK
@@ -70,13 +69,10 @@ always @ (posedge SSPCLKIN) begin
 		RxData[rcount[2:0]] = SSPRXD;
 		rcount = rcount - 4'b1;
 	end
-end
-
-always @ (negedge SSPCLKIN) begin
-	if(rcount[3]) begin	// If 8 bits have been read in, write to RxFIFO
+	if(rcount[3]) begin	// If 8 bits have been read in, write to RxFIFO on negedge
 		rwrite = 1'b1;
-	end
-	else
+		rcount = 4'b0111;
+	end else
 		rwrite = 1'b0;
 end
 endmodule
