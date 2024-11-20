@@ -11,8 +11,8 @@ module ssp_test1;
 			clear_b = 1'b0;
 			psel = 1'b0;
 			sspclkin = 1'b0;
-    			sspfssin = 1'b0;
-    			ssprxd = 1'b0;
+			sspfssin = 1'b0;
+			ssprxd = 1'b0;
 		@(posedge clock);
 		#1;
 		@(posedge clock);
@@ -41,7 +41,11 @@ module ssp_test1;
 // serial output from SSP is looped back to the serial input.
 
 	ssp ssp1 (.PCLK(clock), .CLEAR_B(clear_b), .PSEL(psel), .PWRITE(pwrite), .SSPCLKIN(sspclkin), .SSPFSSIN(sspfssin), .SSPRXD(ssprxd), .PWDATA(data_in), .PRDATA(data_out), .SSPCLKOUT(sspclkout), .SSPFSSOUT(sspfssout), .SSPTXD(ssptxd), .SSPOE_B(sspoe_b), .SSPTXINTR(ssptxintr), .SSPRXINTR(ssprxintr));
-
+	// initial begin
+	// 	$display("SSPCLKOUT | TxFIFO[0] | TxData | SSPTXD | SSPFSSOUT | ssptxintr");
+	// 	// $monitor("%b, %b, %b, %b | %b %b | %d", ssp1.SSPCLKOUT, ssp1.TxFIFO.memory[0], ssp1.TxData, ssptxd, sspfssout, ssptxintr, $time);
+	// end
+	// always @(posedge sspclkout) $display("%b, %b, %b, %b | %b %b", sspclkout, ssp1.TxFIFO.memory[0], ssp1.TxData, ssptxd, sspfssout, ssptxintr);
 endmodule
 
 module ssp_test2;
@@ -85,6 +89,10 @@ module ssp_test2;
 // serial output from SSP is looped back to the serial input.
 
 	ssp ssp2 (.PCLK(clock), .CLEAR_B(clear_b), .PSEL(psel), .PWRITE(pwrite), .SSPCLKIN(clk_wire), .SSPFSSIN(fss_wire), .SSPRXD(tx_to_rx), .PWDATA(data_in), .PRDATA(data_out), .SSPCLKOUT(clk_wire), .SSPFSSOUT(fss_wire), .SSPTXD(tx_to_rx), .SSPOE_B(oe_b), .SSPTXINTR(ssptxintr), .SSPRXINTR(ssprxintr));
-
+	
+	// initial begin
+	// 	$display("RXD | RxData | rwrite | wrtptr | readptr | ssprxintr");
+	// 	$monitor("%b, %b | %b %b %b %b", tx_to_rx, ssp2.RxData, ssp2.rwrite, ssp2.RxFIFO.wrtptr, ssp2.RxFIFO.readptr, ssprxintr);
+	// end
 endmodule
 

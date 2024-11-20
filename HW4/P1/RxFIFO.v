@@ -11,18 +11,27 @@ reg SSPRXINTR;
 assign OUT_DATA = memory[readptr];
 
 always @ (posedge PCLK) begin
-	if(CLEAR_B) begin
+	if(~CLEAR_B) begin
 		wrtptr <= 2'b0; 	// Represents lowest empty location
 		readptr <= 2'b0; 	// Represents lowest non-empty location
 		SSPRXINTR <= 1'b0; 	// If points are equal, this denotes if the queue is full/empty
 	end
 
+	// If SSP active, nonempty, and we want to read
+	// Increment counter and 'write data out' (on negedge in peripheral)
+	if(PSEL && ~PWRITE && (readptr != wrtptr || SSPRXINTR)) begin
+		readptr = readptr + 2'b1;
+		SSPRXINTR = 1'b0;
+	end
+end
+
+always @ (negedge PCLK) begin
 	if(write) begin
 		if(~SSPRXINTR) begin
 			memory[wrtptr] = IN_DATA;
 			wrtptr = wrtptr + 2'b1;
 		end
-		// After addition, check if wrtprt if equal to readptr
+		// After addition, check if wrtptr if equal to readptr
 		// If so, FIFO is full (if after write ptrs are equal fifo is full)
 		// (b/c before write we guarantee it is not full)
 		if(wrtptr == readptr)
@@ -30,12 +39,5 @@ always @ (posedge PCLK) begin
 		else
 			SSPRXINTR = 1'b0;
 	end
-end
-
-always @ (negedge PCLK) begin
-	// If SSP active and FIFO nonempty, and we want to read
-	// Increment counter and 'write data out' (on negedge in peripheral)
-	if(PSEL && ~PWRITE)
-		readptr = readptr + 2'b1;
 end
 endmodule

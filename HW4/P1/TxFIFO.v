@@ -11,7 +11,7 @@ reg ready, SSPTXINTR;
 assign OUT_DATA = memory[readptr];
 
 always @ (posedge PCLK) begin
-	if(CLEAR_B) begin
+	if(~CLEAR_B) begin
 		wrtptr <= 2'b0; 	// Represents lowest empty location
 		readptr <= 2'b0; 	// Represents lowest non-empty location
 		ready <= 1'b0;		// Signal to Logic module that data is ready (nonempty)
@@ -45,7 +45,9 @@ end
 always @ (negedge PCLK) begin
 	// If data was ready and was read out (acting on actions from last clock pulse)
 	// Increment counter after data was written out (on negedge in ssp module)
-	if(read)
+	if(read) begin
 		readptr = readptr + 2'b1;
+		SSPTXINTR = 1'b0;
+	end
 end
 endmodule
