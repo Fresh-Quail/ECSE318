@@ -7,12 +7,12 @@ module ssp_test1;
 
 	initial 
 	begin
-			clock = 1'b0;
-			clear_b = 1'b0;
-			psel = 1'b0;
-			sspclkin = 1'b0;
-			sspfssin = 1'b0;
-			ssprxd = 1'b0;
+		clock = 1'b0;
+		clear_b = 1'b0;
+		psel = 1'b0;
+		sspclkin = 1'b0;
+		sspfssin = 1'b0;
+		ssprxd = 1'b0;
 		@(posedge clock);
 		#1;
 		@(posedge clock);
