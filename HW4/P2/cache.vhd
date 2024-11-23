@@ -32,67 +32,71 @@ architecture behavioral of cache is
   signal valid    : valid_array := (others => '0');
   signal tag_mem  : tag_array := (others => (others => '0'));
   signal cache_mem  : cache_memory := (others => (others => '0'));
-signal data_mem : data_array := (
-    16#12# => x"00000012",  -- 16#0012# converted to 32-bit
-    16#45# => x"00000045",  -- 16#0045# converted to 32-bit
-    16#76# => x"00000076",  -- 16#0076# converted to 32-bit
-    16#66# => x"00000066",  -- 16#0066# converted to 32-bit
-    16#59# => x"00000059",  -- 16#0059# converted to 32-bit
-    others => (others => '0')
-);
+  signal data_mem : data_array := ( -- Init memory for testbench
+      16#12# => x"00000012",  -- 16#0012# converted to 32-bit
+      16#45# => x"00000045",  -- 16#0045# converted to 32-bit
+      16#76# => x"00000076",  -- 16#0076# converted to 32-bit
+      16#66# => x"00000066",  -- 16#0066# converted to 32-bit
+      16#59# => x"00000059",  -- 16#0059# converted to 32-bit
+      others => (others => '0')
+  );
+  signal ready          : std_logic;
 
 begin
   process(clk)
   variable index        : std_logic_vector(7 downto 0) := (others => '0');
   variable tag          : std_logic_vector(5 downto 0) := (others => '0');
-  variable count        : std_logic_vector(1 downto 0) := (others => '0');
+  variable count        : std_logic_vector(2 downto 0) := (others => '0');
   begin
-    if (p_strobe = '1' or count /= "00") then
-      if rising_edge(clk) then
+    if rising_edge(clk) then
+      if (p_strobe = '1' or count /= "000") then
           index := address(9 downto 2);
           tag := address(15 downto 10);
             if pro_rw = '1' then
                 if valid(to_integer(unsigned(index))) = '1' and tag_mem(to_integer(unsigned(index))) = tag then
                     -- cache hit logic
                     p_data_bus <= cache_mem(to_integer(unsigned(index)));
+                    ready <= '1';
                     p_ready <= '1';
                 else
                     -- cache miss logic
                     -- Cache miss: load from memory (wait 4 cycles)
-                    if(count = "11") then
-                      valid(to_integer(unsigned(index))) <= '1'; 
-                      tag_mem(to_integer(unsigned(index))) <= tag; 
-                      cache_mem(to_integer(unsigned(index))) <= data_mem(to_integer(unsigned(address))); 
+                    if(count = "100") then
+                      valid(to_integer(unsigned(index))) <= '1';
+                      tag_mem(to_integer(unsigned(index))) <= tag;
+                      cache_mem(to_integer(unsigned(index))) <= data_mem(to_integer(unsigned(address)));
                       p_data_bus <= data_mem(to_integer(unsigned(address)));
                       p_ready <= '1';
-                      count := count + "01";
+                      count := "000";
                     else
-                      count := count + "01";
+                      count := count + "001";
+                      p_ready <= '0';
                       p_data_bus <= (others => 'Z');
                     end if;
                 end if;
             else
-                -- write to cache and memory                    
-                -- valid(to_integer(unsigned(index))) <= '1';
-                -- tag_mem(to_integer(unsigned(index))) <= tag;
-                -- cache_mem(to_integer(unsigned(index))) <= p_data_bus after 400 ps;
-
-                -- data_mem(to_integer(unsigned(address))) <= p_data_bus after 400 ps;
-                -- p_ready <= '1' after 400 ps;
-              if(count = "11") then
-                valid(to_integer(unsigned(index))) <= '1'; 
-                tag_mem(to_integer(unsigned(index))) <= tag; 
-                cache_mem(to_integer(unsigned(index))) <= data_mem(to_integer(unsigned(address))); 
-                p_data_bus <= data_mem(to_integer(unsigned(address)));
+              if(count = "100") then
+                valid(to_integer(unsigned(index))) <= '1';
+                tag_mem(to_integer(unsigned(index))) <= tag;
+                cache_mem(to_integer(unsigned(index))) <= p_data_bus;
+                data_mem(to_integer(unsigned(address))) <= p_data_bus;
                 p_ready <= '1';
-                count := count + "01";
+                ready <= '1';
+                count := "000";
               else
-                count := count + "01";
+                count := count + "001";
+                p_ready <= '0';
                 p_data_bus <= (others => 'Z');
               end if;
             end if;
+      else
+        if(ready = '1') then
+          ready <= '0';
+          p_ready <= '0';
+          p_data_bus <= (others => 'Z');
         end if;
-    end if;
+      end if; -- p_strobe endif
+    end if; -- clk endif
   end process;
 end architecture behavioral;
 
