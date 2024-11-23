@@ -34,7 +34,6 @@ module traffic_light_controller_tb;
         forever #5 clk = ~clk; 
     end
 
-    
     initial begin
         rst = 1;
         #5;
