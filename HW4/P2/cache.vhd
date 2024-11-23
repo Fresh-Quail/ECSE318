@@ -4,16 +4,6 @@ library IEEE;
   use IEEE.NUMERIC_STD.ALL;
 entity cache is 
   port(
-    -- in_data: in STD_LOGIC_VECTOR(31 downto 0);
-    -- p_address: in STD_LOGIC_VECTOR(15 downto 0);
-    -- clk: in STD_LOGIC;
-    -- p_strobe: in STD_LOGIC;
-    -- pro_rw: in STD_LOGIC;
-    -- p_ready: out STD_LOGIC;
-    -- sys_rw: out STD_LOGIC;
-    -- sys_address: out STD_LOGIC_VECTOR(15 downto 0);
-    -- p_out_data: out std_logic_vector(31 downto 0);
-    -- out_data: out STD_LOGIC_VECTOR(8 downto 0)
     clk: in STD_LOGIC;
     pro_rw: in STD_LOGIC;
     p_strobe: in STD_LOGIC;

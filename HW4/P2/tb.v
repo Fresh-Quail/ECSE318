@@ -12,11 +12,11 @@ module fullmodule;
     cache mod(clock, inprw, inp_strobe, in_addr, ready, data_bus);
 
 initial begin
-    $display("clk | inp_strobe  inprw  in_addr  data_in | data_bus  ready");
-    $monitor($time, "%b | %b, %b, %b, %d | %d, %b", clock, inp_strobe, inprw, in_addr, data_in, mod.cache.p_data_bus, ready);
+    $display("Clk | strobe  prw  addr \t| data_bus  ready | Time");
     #10000;
     $finish;
 end
+always @(posedge clock) $display("%b | %b, %b, %b | %d, %b", clock, inp_strobe, inprw, in_addr, mod.cache.p_data_bus, ready, $time);
 
 initial begin
     // $readmemb("data_mem.bin", mod.data_mem);

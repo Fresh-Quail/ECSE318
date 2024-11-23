@@ -90,9 +90,9 @@ module ssp_test2;
 
 	ssp ssp2 (.PCLK(clock), .CLEAR_B(clear_b), .PSEL(psel), .PWRITE(pwrite), .SSPCLKIN(clk_wire), .SSPFSSIN(fss_wire), .SSPRXD(tx_to_rx), .PWDATA(data_in), .PRDATA(data_out), .SSPCLKOUT(clk_wire), .SSPFSSOUT(fss_wire), .SSPTXD(tx_to_rx), .SSPOE_B(oe_b), .SSPTXINTR(ssptxintr), .SSPRXINTR(ssprxintr));
 	
-	// initial begin
-	// 	$display("RXD | RxData | rwrite | wrtptr | readptr | ssprxintr");
-	// 	$monitor("%b, %b | %b %b %b %b", tx_to_rx, ssp2.RxData, ssp2.rwrite, ssp2.RxFIFO.wrtptr, ssp2.RxFIFO.readptr, ssprxintr);
-	// end
+	initial begin
+		$display("Clock : PSEL | PWDATA PRDATA | TXINTR RXINTR | TxFIFO\t\t|\t\tRxFIFO \t\t\tTime");
+		$monitor("%b %b | %d %d | %b %b | %p %p", clock, psel, data_in, data_out, ssptxintr, ssprxintr, ssp2.TxFIFO.memory, ssp2.RxFIFO.memory, $time);
+	end
 endmodule
 
