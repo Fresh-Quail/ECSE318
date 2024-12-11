@@ -114,13 +114,14 @@ if __name__ == "__main__":
 
 
     # print("\nType, Out, Lvl, fanInN")
-    for gate in gates.values():
-        print(gate.type, gate.output, gate.level, gate.fanInN, end=' ')
-        for fanin in gate.fanin:
-            print(fanin, end=' ')
+    with open("gates.txt", 'w') as f:
+        for gate in gates.values():
+            print(gate.type, gate.output, gate.level, gate.fanInN, end=' ', file=f)
+            for fanin in gate.fanin:
+                print(fanin, end=' ', file=f)
 
-        print(gate.fanOutN, end=' ')
-        for fanout in gate.fanout:
-            print(fanout, end=' ')
-        print(gate.name)
+            print(gate.fanOutN, end=' ', file=f)
+            for fanout in gate.fanout:
+                print(fanout, end=' ', file=f)
+            print(gate.name, file=f)
                 
