@@ -4,14 +4,13 @@ import re
 class Gate():
     def __init__(self):
         self.type = None
-        self.output = False
         self.level = -1
         self.fanInN = 0
         self.fanin = []
         self.fanOutN = 0
         self.fanout = []
         self.name = ''
-        self.output = False
+        self.output = 'false'
         self.visited = False
 
 if __name__ == "__main__":
@@ -20,6 +19,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     level_list = []
+    max_level = -1
     with open(args.filename, 'r') as file:
         gates = dict()
         while (line:=file.readline().strip()) != 'endmodule':
@@ -39,7 +39,7 @@ if __name__ == "__main__":
                 gate = Gate()
                 gate.type = line[0]
                 if line[0] == 'output':
-                    gate.output = True
+                    gate.output = 'true'
                     level_list.append([line[1].replace(';', ''), gate])
                 gate.fanInN = 0
                 gate.fanin = []
@@ -108,6 +108,7 @@ if __name__ == "__main__":
                 for fanout in gate.fanout:
                     if gate.type != 'dff' and fanout != gname:
                         gates[fanout].level = max(gates[fanout].level, gate.level + 1)
+                        max_level = max(max_level, gates[fanout].level)
                         # print(fanout, ": ", gates[fanout].level, end=' -- ')
                 # print()
             else: finished = False
@@ -115,6 +116,8 @@ if __name__ == "__main__":
 
     # print("\nType, Out, Lvl, fanInN")
     with open("gates.txt", 'w') as f:
+        print("Max_level: ", max_level, file=f)
+        print("Total_gates: ", len(gates.keys()), file=f)
         for gate in gates.values():
             print(gate.type, gate.output, gate.level, gate.fanInN, end=' ', file=f)
             for fanin in gate.fanin:
