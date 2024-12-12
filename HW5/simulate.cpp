@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
-#include <stdlib.h>
+#include <ctime>
 
 using namespace std;
 
@@ -79,6 +79,7 @@ std::vector<Gate*> inputs;
 std::vector<Gate*> dffs;
 std::vector<Gate*> outputs; 
 int max_level = -1;
+bool lookup_mode = true;
 
 void parseLine(const std::string& line) {
     std::istringstream iss(line);
@@ -152,46 +153,45 @@ void parseFile() {
     input.close();
 }
 
-// Table lookup method
-char table_evaluate(Gate* g){
-    gate_type g_type = g->type;
-    char state_fanin0 = g->fanIn[0]->state;
-
-    if(g_type == NOT)
-        return inv_table[state_fanin0];
-    if (g_type == BUFF) 
-        return state_fanin0;
-
-    char state_fanin1 = g->fanIn[1]->state;
-    char v = lookup_table[g_type][state_fanin0][state_fanin1];
-    // cout << g->fanOut[0]->name << ": " << (int)state_fanin0 << " " << g->gtype << " " << (int)state_fanin1 << " = " << (int)v << endl;
-    int N = g->fanInN;
-    for(int i = 2; i < N ; i++) {
-        state_fanin0 = g->fanIn[i]->state ;
-        v = lookup_table[g_type][state_fanin0][v] ;
-    }
-    return v;
-}
-
 char evaluate(Gate* g){
-    gate_type type = g->type;
-    if(type == NOT)
-        return inv_table[g->fanIn[0]->state];
-    if (type == BUFF) 
-        return g->fanIn[0]->state;
-        
-    bool undef = false;
-    for(int i=0; i < g->fanInN ;i++){
-        char V = g->fanIn[i]->state;
-        if(V == scan_table[type][0]){
-            return(V ^ scan_table[type][1]);
+    if(lookup_mode){   
+        gate_type g_type = g->type;
+        char state_fanin0 = g->fanIn[0]->state;
+
+        if(g_type == NOT)
+            return inv_table[state_fanin0];
+        if (g_type == BUFF) 
+            return state_fanin0;
+
+        char state_fanin1 = g->fanIn[1]->state;
+        char v = lookup_table[g_type][state_fanin0][state_fanin1];
+        // cout << g->fanOut[0]->name << ": " << (int)state_fanin0 << " " << g->gtype << " " << (int)state_fanin1 << " = " << (int)v << endl;
+        int N = g->fanInN;
+        for(int i = 2; i < N ; i++) {
+            state_fanin0 = g->fanIn[i]->state ;
+            v = lookup_table[g_type][state_fanin0][v] ;
         }
-        if(V == 2) 
-            undef = true;
+        return v;
+    } else{        
+        gate_type type = g->type;
+        if(type == NOT)
+            return inv_table[g->fanIn[0]->state];
+        if (type == BUFF) 
+            return g->fanIn[0]->state;
+            
+        bool undef = false;
+        for(int i=0; i < g->fanInN ;i++){
+            char V = g->fanIn[i]->state;
+            if(V == scan_table[type][0]){
+                return(V ^ scan_table[type][1]);
+            }
+            if(V == 2) 
+                undef = true;
+        }
+        if(undef)
+            return 2;
+        return !scan_table[type][0] ^ scan_table[type][1];
     }
-    if(undef)
-        return 2;
-    return !scan_table[type][0] ^ scan_table[type][1];
 }
 
 void schedule_fanout(Gate* g){
@@ -208,28 +208,27 @@ void schedule_fanout(Gate* g){
     }
 }
 
-void simulate(string input_vec){
+void simulate(string input_vec, ofstream* outfile){
     int i = 0;
-    cout << "INPUT   :";
+    *outfile << "INPUT   :";
     for(char c : input_vec){
         inputs[i]->state = c - '0';
-        cout << (int)inputs[i]->state;
+        *outfile << (int)inputs[i]->state;
         // schedule fanouts of changed inputs.
         schedule_fanout(inputs[i]);
         i = i + 1;
     }
     // Print output states
-    cout << endl << "STATE   :";
+    *outfile << endl << "STATE   :";
     for(Gate* dff : dffs){
-        cout << (int)dff->state;
+        *outfile << (int)dff->state;
     }
 
-    cout << endl << "OUTPUT   :";
+    *outfile << endl << "OUTPUT   :";
     for(Gate* out : outputs){
-        cout << (int)out->state;
+        *outfile << (int)out->state;
     }
-    cout << endl;
-    cout << endl;
+    *outfile << endl << endl;
 
     for(Gate* dff : dffs){
         schedule_fanout(dff);
@@ -249,18 +248,21 @@ void simulate(string input_vec){
 
 int main(){
     parseFile();
-    // cout << "Levels" << endl;
-    // for(int i = 0; i < levels[0].size(); i++)
-    //     cout << levels[0][i]->name << endl;
-        
-    // cout << "Inputs" << endl;
-    // for(int i = 0; i < inputs.size(); i++)
-    //     cout << inputs[i]->name << endl;
-    std::ifstream input("S385.vec");
+    string filename, mode;
+    cout << "Type in the name of the vector file you want to use (w/ extension): ";
+    cin >> filename;
+    cout << "Type in the letter of the choice you want to use: " << endl << "1. Table Lookup" << endl << "2. Input Scanning" << endl;
+    cin >> mode;
+    lookup_mode = mode == "1";
+    
+    std::ifstream input(filename);
     std::string input_vec;
-    // getline(input, input_vec);
-    // getline(input, input_vec);
+    std::ofstream outfile("sim.txt");
+    clock_t start = clock();
     while(getline(input, input_vec)){
-        simulate(input_vec);
+        simulate(input_vec, &outfile);
     }
+    clock_t end = clock();
+    cout << "Time taken to run the program: " << double(end - start) / CLOCKS_PER_SEC << " seconds" << endl;
+    cout << "Output saved in sim.txt" << endl;
 }
