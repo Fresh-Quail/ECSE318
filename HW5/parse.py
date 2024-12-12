@@ -79,7 +79,7 @@ if __name__ == "__main__":
                 line[2] = re.sub(r"[();]", "", line[2]).split(',') # Format the gate arguments
                 gate = gates.get(line[2][0:1][0], Gate())
                 gate.type = line[0]
-                gate.fanin.extend(line[2][1:])
+                gate.fanin = line[2][1:]
                 gate.fanInN = len(gate.fanin)
                 if line[0] == 'dff':
                     gate.level = 0
