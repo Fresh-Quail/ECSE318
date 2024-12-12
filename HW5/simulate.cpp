@@ -147,10 +147,10 @@ void parseFile() {
     max_level = stoi(str);
     getline(input, line);
     cout << line << endl;
+    getline(input, line);
     while (std::getline(input, line)) {
         parseLine(line);
     }
-    input.close();
 }
 
 char evaluate(Gate* g){
