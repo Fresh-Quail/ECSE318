@@ -117,11 +117,14 @@ if __name__ == "__main__":
                 level_list.append(gates[fanout])
                 gates[fanout].level = max(gates[fanout].level, gate.level + 1)
                 max_level = max(max_level, gates[fanout].level)
+    levels = [0] * (max_level + 1)
+    for gate in gates.values():
+        levels[gate.level] = levels[gate.level] + 1
 
-    # print("\nType, Out, Lvl, fanInN")
     with open("gates.txt", 'w') as f:
         print("Max_level: ", max_level, file=f)
         print("Total_gates: ", len(gates.keys()), file=f)
+        print("Gates_per_level: ", levels, file=f)
         for gate in gates.values():
             print(gate.type, gate.output, gate.level, gate.fanInN, end=' ', file=f)
             for fanin in gate.fanin:
