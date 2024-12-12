@@ -12,6 +12,17 @@ class Gate():
         self.name = ''
         self.output = 'false'
 
+def make_buffer(fanin, name):
+    buf = Gate()
+    buf.type = 'buff'
+    buf.level = -1
+    buf.fanInN = 1
+    buf.fanOutN = 1
+    buf.fanin = [fanin]
+    buf.fanout = [name]
+    buf.name = f"BUF{gates[fanin].fanOutN}{fanin}"
+    return buf
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('filename', help="Name of the input file")
@@ -78,9 +89,27 @@ if __name__ == "__main__":
                 # Add gate to dictionary and do logic using its fanout as the name
                 gates[gate.name] = gate
                 # For each fan in on this gate, add this gate to the corresponding gate's fanout
-                for fanin in gate.fanin:
-                    gates[fanin].fanout.append(gate.name)
-                    gates[fanin].fanOutN = gates[fanin].fanOutN + 1
+                for idx, fanin in enumerate(gate.fanin):
+                    if gates[fanin].fanOutN > 0:
+                        if gates[fanin].fanOutN == 1:
+                            buf = make_buffer(fanin, gates[fanin].fanout[0])
+                            # Swap the first wire on the fanin gate, to the buffer
+                            index = gates[gates[fanin].fanout[0]].fanin.index(fanin)
+                            gates[gates[fanin].fanout[0]].fanin[index] = buf.name
+                            gates[fanin].fanout[0] = buf.name
+                            # Swap the fanin of that gate, to the buffer
+                            gates[fanin].fanout[0] = buf.name
+                            gates[buf.name] = buf
+                        # Add the second buffer
+                        gates[fanin].fanOutN = gates[fanin].fanOutN + 1
+                        buf = make_buffer(fanin, gate.name)
+                        gates[fanin].fanout.append(buf.name)
+                        gate.fanin[idx] = buf.name
+                        gates[buf.name] = buf
+                        
+                    else:
+                        gates[fanin].fanout.append(gate.name)
+                        gates[fanin].fanOutN = gates[fanin].fanOutN + 1
     
     for gate in level_list:
         for fanout in gate.fanout:
